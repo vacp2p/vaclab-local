@@ -1,6 +1,7 @@
 # vaclab-local
-A local vaclab based on rancher desktop.
-This repository helps you build a functional single-node Kubernetes setup with monitoring, logging, and other required components exposed through local ingresses.
+A local vaclab clone based on rancher desktop.
+
+This repository helps you build a functional single-node cluster clone of the original vaclab environment with monitoring, logging, and other required components exposed through local ingresses.
 
 ---
 
