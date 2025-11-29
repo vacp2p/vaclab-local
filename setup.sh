@@ -4,8 +4,6 @@ VLOGS_NAMESPACE="victorialogs"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 VMETRICS_VALUES_FILE="$SCRIPT_DIR/vmetrics.values.yaml"
 VLOGS_VALUES_FILE="$SCRIPT_DIR/vlogs.values.yaml"
-VACLAB_SYSCTL_CONF="$SCRIPT_DIR/99-vaclab.sysctl.conf"
-SYSCTL_DIR="/etc/sysctl.d/"
 
 # Restart Traefik to apply the new sysctl settings
 echo "[INFO] Waiting for Traefik deployment to be ready..."
