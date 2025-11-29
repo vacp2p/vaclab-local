@@ -19,7 +19,6 @@ This repository helps you build a functional single-node cluster clone of the or
 | Windows support                        | ❌ Not yet |
 | Documentation completeness              | ⚠️ Partial |
 
-> Legend: ✅ OK | ❌ No/Not yet | ⚠️ Partial
 
 ---
 
@@ -27,7 +26,7 @@ This repository helps you build a functional single-node cluster clone of the or
 
 - [Rancher Desktop](https://rancherdesktop.io/) (latest)
 - OS: Linux (Debian recommended) or macOS
-- **Linux only:** To allow Traefik to bind to port 80, update kernel parameters:
+- **Linux only:** To allow Traefik to bind to port 80:
   1. Copy the provided sysctl config file:
      ```bash
      sudo cp 99-vaclab.sysctl.conf /etc/sysctl.d/
@@ -38,14 +37,13 @@ This repository helps you build a functional single-node cluster clone of the or
      ```
   > By default, Linux restricts binding to ports <1024 to root. The sysctl config sets `net.ipv4.ip_unprivileged_port_start=80`, allowing Traefik (running as non-root in Kubernetes) to listen on port 80. This step is not required on macOS or Windows.
 
-> **Note:** Rancher Desktop provides `kubectl` and `helm` binaries in `~/.rd/bin/`. You do not need to install them separately.
-
 ---
 
 ## 🖥️ Rancher Desktop Setup
 
 1. **Install Rancher Desktop**
    - Follow the official instructions for your platform: [Rancher Desktop Installation Guide](https://docs.rancherdesktop.io/getting-started/installation/#installation-via-deb-package)
+   > **Note:** Rancher Desktop provides `kubectl` and `helm` binaries in `~/.rd/bin/`. You do not need to install them separately.
 2. **First Launch:**
    - Enable Kubernetes in the Rancher Desktop UI.
    - Choose either Docker or containerd as your container runtime (both are valid).
@@ -67,23 +65,18 @@ This repository helps you build a functional single-node cluster clone of the or
 
 ## 🚀 Quick Start
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/vacp2p/vaclab-local.git
-   cd vaclab-local
-   ```
-2. **Review and edit values files if needed (optional):**
+1. **Review and edit values files if needed (optional):**
    - `vmetrics.values.yaml` (VictoriaMetrics monitoring stack)
    - `vlogs.values.yaml` (VictoriaLogs stack)
-3. **Run the setup script:**
+2. **Run the setup script:**
    ```bash
    ./setup.sh
    ```
-   > **Note:** Run as a regular user (not with `sudo`). The script will use `sudo` only for system changes.
+   > **Note:** Run as a regular user (not with `sudo`)
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 - **Kubernetes (Rancher Desktop):** Local single-node K3S cluster
 - **Traefik:** Ingress controller for local domains (e.g., `grafana.localtest.me` and `vselect.localtest.me`)
@@ -98,7 +91,7 @@ This repository helps you build a functional single-node cluster clone of the or
 For easy access, all services are exposed via **localtest.me** using ingress (no TLS used for now, everything is exposed through http)
 
 - Grafana at: [http://grafana.localtest.me](http://grafana.localtest.me)
-- VictoriaLogs at: [http://vselect.localtest.me](http://vselect.localtest.me/select/vmui)
+- VictoriaLogs at: [http://vselect.localtest.me](http://vlselect.localtest.me/select/vmui/)
 
 ---
 
