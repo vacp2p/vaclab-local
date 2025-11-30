@@ -56,6 +56,7 @@ For easy access, all services are exposed via **localtest.me** using ingress (no
    > **Note:** Rancher Desktop provides `kubectl` and `helm` binaries in `~/.rd/bin/`. You do not need to install them separately.
 2. **First Launch:**
    - Enable Kubernetes in the Rancher Desktop UI.
+   > Select v1.33.6 (stable)
    - Choose either Docker or containerd as your container runtime (both are valid).
 3. **Environment Setup:**
    - After enabling Kubernetes, ensure your shell exports the Rancher Desktop binaries:
