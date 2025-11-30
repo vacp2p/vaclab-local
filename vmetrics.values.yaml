@@ -930,7 +930,8 @@ vmagent:
     port: "8429"
     selectAllByDefault: true
     scrapeInterval: 20s
-    externalLabels: {}
+    externalLabels:
+      cluster: "rancher-desktop"
       # For multi-cluster setups it is useful to use "cluster" label to identify the metrics source.
       # For example:
       # cluster: cluster-name
@@ -1211,6 +1212,12 @@ kubelet:
         - action: drop
           source_labels: [__name__]
           regex: (rest_client_request_duration_seconds_bucket|rest_client_request_duration_seconds_sum|rest_client_request_duration_seconds_count)
+        # Add this to bypass image != "" filter in grafana dashboards
+        - action: replace
+          sourceLabels: [container]
+          targetLabel: image
+          regex: "(.+)"
+          replacement: "$1"
       relabelConfigs:
         - action: labelmap
           regex: __meta_kubernetes_node_label_(.+)
