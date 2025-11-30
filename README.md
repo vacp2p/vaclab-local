@@ -81,7 +81,7 @@ For easy access, all services are exposed via **localtest.me** using ingress (no
    - `vlogs.values.yaml` (VictoriaLogs stack)
 2. **Run the setup script:**
    ```bash
-   ./setup.sh
+   sh setup.sh
    ```
    > **Note:** Run as a regular user (not with `sudo`)
 
