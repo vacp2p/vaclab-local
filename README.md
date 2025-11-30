@@ -55,9 +55,11 @@ For easy access, all services are exposed via **localtest.me** using ingress (no
    - Follow the official instructions for your platform: [Rancher Desktop Installation Guide](https://docs.rancherdesktop.io/getting-started/installation/#installation-via-deb-package)
    > **Note:** Rancher Desktop provides `kubectl` and `helm` binaries in `~/.rd/bin/`. You do not need to install them separately.
 2. **First Launch:**
-   - Enable Kubernetes in the Rancher Desktop UI.
-   > Select v1.33.6 (stable)
-   - Choose either Docker or containerd as your container runtime (both are valid).
+   - Enable Kubernetes in the UI (toggle the Kubernetes option).
+   - Select Kubernetes version **v1.33.6 (stable)** for best compatibility.
+   - Choose either Docker or containerd as your container runtime (both are supported).
+   - Wait for Rancher Desktop to finish provisioning the cluster. The **Cluster Dashboard** menu will become clickable when ready.
+
 3. **Environment Setup:**
    - After enabling Kubernetes, ensure your shell exports the Rancher Desktop binaries:
      ```bash
