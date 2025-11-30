@@ -57,7 +57,8 @@ For easy access, all services are exposed via **localtest.me** using ingress (no
 2. **First Launch:**
    - Enable Kubernetes in the UI (toggle the Kubernetes option).
    - Select Kubernetes version **v1.33.6 (stable)** for best compatibility.
-   - Choose either Docker or containerd as your container runtime (both are supported).
+   - Choose containerd as your container runtime. 
+   > with Docker some metric labels are not exported by cadvisor.
    - Wait for Rancher Desktop to finish provisioning the cluster. The **Cluster Dashboard** menu will become clickable when ready.
 
 3. **Environment Setup:**

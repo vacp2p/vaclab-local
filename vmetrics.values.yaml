@@ -1212,12 +1212,12 @@ kubelet:
         - action: drop
           source_labels: [__name__]
           regex: (rest_client_request_duration_seconds_bucket|rest_client_request_duration_seconds_sum|rest_client_request_duration_seconds_count)
-        # Add this to bypass image != "" filter in grafana dashboards
-        - action: replace
-          sourceLabels: [container]
-          targetLabel: image
-          regex: "(.+)"
-          replacement: "$1"
+        # Add this to bypass image != "" filter in grafana dashboards in case runtime is Docker
+        #- action: replace
+        #  sourceLabels: [container]
+        #  targetLabel: image
+        #  regex: "(.+)"
+        #  replacement: "$1"
       relabelConfigs:
         - action: labelmap
           regex: __meta_kubernetes_node_label_(.+)
