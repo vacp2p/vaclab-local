@@ -10,7 +10,6 @@ This repository helps you build a functional single-node cluster clone of the or
 | Original vaclab VictoriaLogs setup      | ✅ OK   |
 | Grafana clone                          | ✅ OK   |
 | Ingress (no port forwarding)            | ✅ OK   |
-| Self-Signed Certs (HTTPS)               | ❌ Not yet   |
 | Tested on Linux                        | ✅ OK   |
 | Tested on Mac                          | ❌ Not yet  |
 | External/P2P access (from other laptop)      | ❌ Not yet |
