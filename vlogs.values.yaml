@@ -248,7 +248,8 @@ server:
 
     # -- Ingress annotations
     annotations:
-      traefik.ingress.kubernetes.io/router.entrypoints: web
+      traefik.ingress.kubernetes.io/router.entrypoints: "web"
+      #traefik.ingress.kubernetes.io/router.tls: "true"
     #   kubernetes.io/tls-acme: 'true'
 
     # -- Ingress extra labels
@@ -262,7 +263,10 @@ server:
         port: http
 
     # -- Array of TLS objects
-    tls: []
+    #tls:
+    #  - secretName: vlogs-ingress-tls
+    #    hosts:
+    #      - vlselect.localtest.me
     #   - secretName: vmselect-ingress-tls
     #     hosts:
     #       - vmselect.local
@@ -427,6 +431,7 @@ vector:
     sources:
       k8s:
         type: kubernetes_logs
+        extra_field_selector: "metadata.namespace!=kube-system,metadata.namespace!=default,metadata.namespace!=kube-public,metadata.namespace!=kube-node-lease,metadata.namespace!=vmetrics,metadata.namespace!=victorialogs"
       internal_metrics:
         type: internal_metrics
     transforms:

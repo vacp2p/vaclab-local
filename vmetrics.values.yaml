@@ -43,7 +43,8 @@ defaultDashboards:
   enabled: true
   defaultTimezone: utc
   labels: {}
-  annotations: {}
+  annotations:
+    grafana_folder: "default"
   grafanaOperator:
     # -- Create dashboards as CRDs (requires grafana-operator to be installed)
     enabled: false
@@ -55,9 +56,9 @@ defaultDashboards:
   # -- Create dashboards as ConfigMap despite dependency it requires is not installed
   dashboards:
     victoriametrics-vmalert:
-      enabled: true
+      enabled: false
     victoriametrics-operator:
-      enabled: true
+      enabled: false
     # -- In ArgoCD using client-side apply this dashboard reaches annotations size limit and causes k8s issues without server side apply
     # See [this issue](https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack#metadataannotations-too-long-must-have-at-most-262144-bytes-on-dashboards)
     node-exporter-full:
@@ -927,9 +928,28 @@ vmagent:
     #- url: http://some-remote-write/api/v1/write
   # -- (object) Full spec for VMAgent CRD. Allowed values described [here](https://docs.victoriametrics.com/operator/api/#vmagentspec)
   spec:
+    inlineScrapeConfig: |-
+      - job_name: 'libp2p-nodes'
+        kubernetes_sd_configs:
+          - role: pod
+        scheme: http
+        metrics_path: /metrics
+        # Override the target address to podIP:8008
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_ip]
+            target_label: __address__
+            replacement: '$1:8008'
+          - source_labels: [__meta_kubernetes_namespace]
+            regex: 'kube-system|default|kube-public|kube-node-lease|vmetrics|victorialogs'
+            action: drop
+        metric_relabel_configs:
+          - source_labels: [__name__]
+            action: keep
+            regex: '^(libp2p_peers|libp2p_open_streams|libp2p_network_bytes_total|nim_gc_mem_bytes|libp2p_gossipsub_low_peers_topics|network_bytes_in_total_port_60000_total|network_bytes_out_total_port_60000_total)$'
+          
     port: "8429"
     selectAllByDefault: true
-    scrapeInterval: 20s
+    scrapeInterval: 15s
     externalLabels:
       cluster: "rancher-desktop"
       # For multi-cluster setups it is useful to use "cluster" label to identify the metrics source.
@@ -1005,6 +1025,7 @@ defaultDatasources:
           dashboards: grafana
       allowCrossNamespaceImport: false
   victoriametrics:
+    enabled: false
     # -- Create per replica prometheus compatible datasource
     perReplica: false
     # -- List of prometheus compatible datasource configurations.
@@ -1022,6 +1043,7 @@ defaultDatasources:
   # -- List of alertmanager datasources.
   # VMAlertmanager generated `url` will be added to each datasource in template if alertmanager is enabled
   alertmanager:
+    enabled: false
     # -- Create per replica alertmanager compatible datasource
     perReplica: false
     datasources:
@@ -1066,7 +1088,10 @@ grafana:
       provider:
         name: default
         orgid: 1
+        foldersFromFilesStructure: true
+        #folder: "vac"
       folder: /var/lib/grafana/dashboards
+      folderAnnotation: grafana_folder
       defaultFolderName: default
       enabled: true
       multicluster: false
@@ -1100,7 +1125,10 @@ grafana:
     #       name: ssl-redirect
     #       port:
     #         name: service
-    tls: []
+    #tls:
+    #  - secretName: grafana-ingress-tls
+    #    hosts:
+    #      - grafana.localtest.me 
     #  - secretName: grafana-ingress-tls
     #    hosts:
     #      - grafana.domain.com
@@ -1168,6 +1196,10 @@ kube-state-metrics:
           metricRelabelConfigs:
             - action: labeldrop
               regex: (uid|container_id|image_id)
+            # drop metrics from kube-system, default, kube-public, kube-node-lease, vmetrics and victorialogs namespaces
+            - action: drop
+              source_labels: [namespace]
+              regex: "kube-system|default|kube-public|kube-node-lease|vmetrics|victorialogs"
       jobLabel: app.kubernetes.io/name
 
 # -- Component scraping the kubelets
@@ -1179,16 +1211,28 @@ kubelet:
       enabled: true
       spec:
         path: /metrics/cadvisor
+        metricRelabelConfigs:
+          - action: drop
+            source_labels: [namespace]
+            regex: "kube-system|default|kube-public|kube-node-lease|vmetrics|victorialogs"
     # -- Enable scraping /metrics/probes from kubelet's service
     probes:
       enabled: true
       spec:
         path: /metrics/probes
+        metricRelabelConfigs:
+          - action: drop
+            source_labels: [namespace]
+            regex: "kube-system|default|kube-public|kube-node-lease|vmetrics|victorialogs"
     # -- Enabled scraping /metrics/resource from kubelet's service
     resources:
       enabled: true
       spec:
         path: /metrics/resource
+        metricRelabelConfigs:
+          - action: drop
+            source_labels: [namespace]
+            regex: "kube-system|default|kube-public|kube-node-lease|vmetrics|victorialogs"
     kubelet:
       spec: {}
   # -- Spec for VMNodeScrape CRD is [here](https://docs.victoriametrics.com/operator/api/#vmnodescrapespec)
@@ -1197,7 +1241,7 @@ kubelet:
     spec:
       scheme: "https"
       honorLabels: true
-      interval: "30s"
+      interval: "15s"
       scrapeTimeout: "5s"
       tlsConfig:
         insecureSkipVerify: true
@@ -1212,6 +1256,9 @@ kubelet:
         - action: drop
           source_labels: [__name__]
           regex: (rest_client_request_duration_seconds_bucket|rest_client_request_duration_seconds_sum|rest_client_request_duration_seconds_count)
+        - action: drop
+          source_labels: [namespace]
+          regex: "kube-system|default|kube-public|kube-node-lease|vmetrics|victorialogs"
         # Add this to bypass image != "" filter in grafana dashboards in case runtime is Docker
         #- action: replace
         #  sourceLabels: [container]
@@ -1225,13 +1272,17 @@ kubelet:
           targetLabel: metrics_path
         - targetLabel: job
           replacement: kubelet
+        # drop metrics from kube-system, default, kube-public, kube-node-lease, vmetrics and victorialogs namespaces
+        - action: drop
+          source_labels: [namespace]
+          regex: "kube-system|default|kube-public|kube-node-lease|vmetrics|victorialogs"
       # ignore timestamps of cadvisor's metrics by default
       # more info here https://github.com/VictoriaMetrics/VictoriaMetrics/issues/4697#issuecomment-1656540535
       honorTimestamps: false
 # Component scraping the kube api server
 kubeApiServer:
   # -- Enable Kube Api Server metrics scraping
-  enabled: true
+  enabled: false
   # -- Spec for VMServiceScrape CRD is [here](https://docs.victoriametrics.com/operator/api/#vmservicescrapespec)
   vmScrape:
     spec:
@@ -1256,7 +1307,7 @@ kubeApiServer:
 # Component scraping the kube controller manager
 kubeControllerManager:
   # -- Enable kube controller manager metrics scraping
-  enabled: true
+  enabled: false
 
   # -- If your kube controller manager is not deployed as a pod, specify IPs it can be found on
   endpoints: []
@@ -1329,7 +1380,7 @@ kubeDns:
 # Component scraping coreDns. Use either this or kubeDns
 coreDns:
   # -- Enabled CoreDNS metrics scraping
-  enabled: true
+  enabled: false
   service:
     # -- Create service for CoreDNS metrics
     enabled: true
@@ -1356,7 +1407,7 @@ coreDns:
 # Component scraping etcd
 kubeEtcd:
   # -- Enabled KubeETCD metrics scraping
-  enabled: true
+  enabled: false
 
   # -- If your etcd is not deployed as a pod, specify IPs it can be found on
   endpoints: []
@@ -1396,7 +1447,7 @@ kubeEtcd:
 # Component scraping kube scheduler
 kubeScheduler:
   # -- Enable KubeScheduler metrics scraping
-  enabled: true
+  enabled: false
 
   # -- If your kube scheduler is not deployed as a pod, specify IPs it can be found on
   endpoints: []
