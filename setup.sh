@@ -1,9 +1,11 @@
 #!/bin/bash
 VMETRICS_NAMESAPACE="vmetrics"
 VLOGS_NAMESPACE="victorialogs"
+TESTING_NAMESPACES="zerotesting zerotesting-dst zerotesting-nimlibp2p"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 VMETRICS_VALUES_FILE="$SCRIPT_DIR/vmetrics.values.yaml"
 VLOGS_VALUES_FILE="$SCRIPT_DIR/vlogs.values.yaml"
+CERT_DIR="$SCRIPT_DIR/certs"
 
 # Restart Traefik to apply the new sysctl settings
 echo "[INFO] Waiting for Traefik deployment to be ready..."
@@ -20,6 +22,14 @@ echo "[INFO] Deploying Victoria Metrics with values file: ${VMETRICS_VALUES_FILE
 helm repo add vm https://victoriametrics.github.io/helm-charts/
 helm repo update
 kubectl create namespace "${VMETRICS_NAMESAPACE}" || true
+# Create testing namespaces
+for ns in ${TESTING_NAMESPACES}; do
+  kubectl create namespace "${ns}" || true
+done
+
+# Create ConfigMap for imported grafana dashboards
+kubectl apply -f imported_dashboards/ -n ${VMETRICS_NAMESAPACE} || true
+# Install Victoria Metrics Helm chart
 helm install vmks vm/victoria-metrics-k8s-stack -f ${VMETRICS_VALUES_FILE} -n ${VMETRICS_NAMESAPACE} --debug
 
 # Deploy Vicoria Logs using Helm
