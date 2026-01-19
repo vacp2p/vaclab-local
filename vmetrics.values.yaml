@@ -293,7 +293,7 @@ vmsingle:
           storage: 20Gi
   ingress:
     # -- Enable deployment of ingress for server component
-    enabled: false
+    enabled: true
     # -- Ingress annotations
     annotations:
       {}
@@ -302,15 +302,15 @@ vmsingle:
     # -- Ingress extra labels
     labels: {}
     # -- Ingress default path
-    path: ""
+    path: "/"
     # -- Ingress path type
     pathType: Prefix
     # -- Ingress controller class name
-    ingressClassName: ""
+    ingressClassName: "traefik"
 
     # -- Array of host objects
-    hosts: []
-    #  - vmsingle.domain.com
+    hosts:
+      - metrics.localtest.me
     # -- Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
     extraPaths: []
     # - path: /*
