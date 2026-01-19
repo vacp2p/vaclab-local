@@ -13,7 +13,7 @@ This repository helps you build a functional single-node cluster clone of the or
 | Tested on Linux                        | ✅ OK   |
 | Tested on Mac                          | ❌ Not yet  |
 | External/P2P access (from other laptop)      | ❌ Not yet |
-| Windows support                        | ❌ No |
+| Tested on Windows                      | ✅ OK |
 | Documentation               | ⚠️ Partial |
 
 ## Local Domains

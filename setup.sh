@@ -4,7 +4,6 @@ VLOGS_NAMESPACE="victorialogs"
 TESTING_NAMESPACES="zerotesting zerotesting-dst zerotesting-nimlibp2p"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 VMETRICS_VALUES_FILE="$SCRIPT_DIR/vmetrics.values.yaml"
-VMETRICS_INGRESS_FILE="$SCRIPT_DIR/vmetrics.ingress.yaml"
 VLOGS_VALUES_FILE="$SCRIPT_DIR/vlogs.values.yaml"
 CERT_DIR="$SCRIPT_DIR/certs"
 
@@ -32,11 +31,6 @@ done
 kubectl apply -f imported_dashboards/ -n ${VMETRICS_NAMESAPACE} || true
 # Install Victoria Metrics Helm chart
 helm install vmks vm/victoria-metrics-k8s-stack -f ${VMETRICS_VALUES_FILE} -n ${VMETRICS_NAMESAPACE} --debug
-
-# Apply VictoriaMetrics Ingress for API access
-echo "[INFO] Applying VictoriaMetrics Ingress..."
-kubectl apply -f ${VMETRICS_INGRESS_FILE}
-echo "[INFO] VictoriaMetrics API available at: http://metrics.localtest.me/api/v1/"
 
 # Deploy Vicoria Logs using Helm
 echo "[INFO] Deploying Victoria Logs with values file: ${VLOGS_VALUES_FILE}"
